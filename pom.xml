@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>atlassian-plugin</packaging>
+
+    <parent>
+        <groupId>com.adaptavist.pom</groupId>
+        <artifactId>scriptrunner-jira-standard</artifactId>
+        <version>31</version>
+        <relativePath/>
+    </parent>
+
+    <scm>
+        <connection>scm:git:https://github.com/Riada-AB/InsightManager</connection>
+    </scm>
+
+    <groupId>customRiadaLibraries</groupId>
+    <artifactId>JiraShortcuts</artifactId>
+    <version>1.0</version>
+
+    <organization>
+        <name>Riada AB</name>
+        <url>http://www.riada.se/</url>
+    </organization>
+
+    <name>JiraShortcuts</name>
+    <description>JiraShortcuts for the most common actions</description>
+
+    <properties>
+        <!-- Set your JIRA Service desk version here -->
+        <jsd.version>4.8.1</jsd.version>
+        <!-- Set your JIRA version here -->
+        <jira.version>8.8.1</jira.version>
+        <!--<insight.version>5.3.1</insight.version>-->
+        <insight.version>8.6.0</insight.version>
+        <!-- Set logging levels for development here -->
+        <logging.levels>com.example;DEBUG,com.onresolve;DEBUG</logging.levels>
+    </properties>
+
+    <dependencies>
+        <!-- The parent pom adds some standard dependencies, but you can add additional ones here -->
+        <dependency>
+            <groupId>customRiadaLibraries</groupId>
+            <artifactId>InsightManager</artifactId>
+            <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.riadalabs.jira.plugins</groupId>
+            <artifactId>insight</artifactId>
+            <version>${insight.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.atlassian.servicedesk</groupId>
+            <artifactId>jira-servicedesk-api</artifactId>
+            <version>${jsd.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.codehaus.plexus</groupId>
+                        <artifactId>plexus-utils</artifactId>
+                        <version>2.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.maven.scm</groupId>
+                        <artifactId>maven-scm-provider-gitexe</artifactId>
+                        <version>1.2</version>
+                    </dependency>
+                </dependencies>
+                <version>1.0</version>
+                <configuration>
+                    <connectionType>connection</connectionType>
+                    <!-- YOUR PATH HERE -->
+                    <checkoutDirectory>InsightManager</checkoutDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>tag</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>tag</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
+            <plugin>
+                <groupId>com.atlassian.maven.plugins</groupId>
+                <artifactId>jira-maven-plugin</artifactId>
+                <configuration>
+                    <productVersion>${jira.version}</productVersion>
+                    <productDataVersion>${jira.version}</productDataVersion>
+
+                    <systemPropertyVariables>
+                        <atlassian.mail.senddisabled>false</atlassian.mail.senddisabled>
+                        <jira.downgrade.allowed>true</jira.downgrade.allowed>
+                    </systemPropertyVariables>
+
+                    <instructions>
+                        <Spring-Context>*;timeout:=60</Spring-Context>
+                        <Import-Package>
+                            com.riadalabs.jira.plugins.insight.services.model;version="${insight.version}",
+                            com.riadalabs.jira.plugins.insight.services.imports.common.external;version="${insight.version}",
+                            com.riadalabs.jira.plugins.insight.services.imports.common.external.model;version="${insight.version}",
+                            com.riadalabs.jira.plugins.insight.services.imports.common.external.model.external;version="${insight.version}",
+                            com.riadalabs.jira.plugins.insight.services.imports.common.external.model.external.baseversion;version="${insight.version}",
+                            com.riadalabs.jira.plugins.insight.services.imports.common.external.model.validation;version="${insight.version}",
+                            com.riadalabs.jira.plugins.insight.services.imports.common.external.insightfield;version="${insight.version}",
+                            com.riadalabs.jira.plugins.insight.services.imports.common.external.insightfield.checkbox;version="${insight.version}",
+                            com.riadalabs.jira.plugins.insight.services.imports.common.external.insightfield.picker;version="${insight.version}",
+                            com.riadalabs.jira.plugins.insight.services.imports.common.external.insightfield.select;version="${insight.version}",
+                            com.riadalabs.jira.plugins.insight.services.imports.common.external.insightfield.text;version="${insight.version}",
+                            com.riadalabs.jira.plugins.insight.services.imports.common.external.insightfield.textarea;version="${insight.version}",
+                            com.tempoplugin.accounts.account.api,
+                            com.tempoplugin.accounts.attributes.api,
+                            com.tempoplugin.accounts.link.api,
+                            *;resolution:="optional"
+                        </Import-Package>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <!-- This is required to find the parent pom and ScriptRunner dependencies -->
+
+        <repository>
+            <id>atlassian-public</id>
+            <url>https://packages.atlassian.com/mvn/maven-external/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>warn</checksumPolicy>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+        </repository>
+        <repository>
+            <id>adaptavist-external</id>
+            <url>https://nexus.adaptavist.com/content/repositories/external</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>fail</checksumPolicy>
+            </releases>
+        </repository>
+        <repository>
+            <id>riada-repo</id>
+            <name>Riada Nexus</name>
+            <url>https://repo.riada.io/repository/riada-repo/</url>
+            <snapshots>
+                <enabled>true</enabled>
+                <checksumPolicy>warn</checksumPolicy>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>warn</checksumPolicy>
+            </releases>
+        </repository>
+    </repositories>
+</project>
